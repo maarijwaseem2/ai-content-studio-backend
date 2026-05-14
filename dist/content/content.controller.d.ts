@@ -28,6 +28,6 @@ export declare class ContentController {
         tokenUsage: import("@prisma/client/runtime/library").JsonValue | null;
         isSaved: boolean;
     }[]>;
-    update(id: string, req: any, body: any): Promise<import("@prisma/client").Prisma.BatchPayload>;
-    remove(id: string, req: any): Promise<import("@prisma/client").Prisma.BatchPayload>;
+    update(id: string, req: any, body: any): Promise<import(".prisma/client").Prisma.BatchPayload>;
+    remove(id: string, req: any): Promise<import(".prisma/client").Prisma.BatchPayload>;
 }
