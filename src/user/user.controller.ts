@@ -23,4 +23,14 @@ export class UserController {
   subscribe(@Request() req, @Body('tier') tier: string) {
     return this.userService.subscribe(req.user.id, tier);
   }
+
+  @Post('delete-request')
+  requestDeletion(@Request() req, @Body('reason') reason?: string) {
+    return this.userService.requestDeletion(req.user.id, reason);
+  }
+
+  @Get('delete-request')
+  getMyDeletionRequest(@Request() req) {
+    return this.userService.getMyDeletionRequest(req.user.id);
+  }
 }

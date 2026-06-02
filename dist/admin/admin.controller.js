@@ -47,6 +47,15 @@ let AdminController = class AdminController {
     getUserContent(id) {
         return this.adminService.getUserContent(id);
     }
+    getDeletionRequests() {
+        return this.adminService.getDeletionRequests();
+    }
+    approveDeletion(id) {
+        return this.adminService.approveDeletionRequest(id);
+    }
+    rejectDeletion(id) {
+        return this.adminService.rejectDeletionRequest(id);
+    }
 };
 exports.AdminController = AdminController;
 __decorate([
@@ -106,6 +115,29 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], AdminController.prototype, "getUserContent", null);
+__decorate([
+    (0, common_1.Get)('deletion-requests'),
+    (0, roles_decorator_1.Roles)('ADMIN'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "getDeletionRequests", null);
+__decorate([
+    (0, common_1.Post)('deletion-requests/:id/approve'),
+    (0, roles_decorator_1.Roles)('ADMIN'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "approveDeletion", null);
+__decorate([
+    (0, common_1.Post)('deletion-requests/:id/reject'),
+    (0, roles_decorator_1.Roles)('ADMIN'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "rejectDeletion", null);
 exports.AdminController = AdminController = __decorate([
     (0, common_1.Controller)('admin'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),

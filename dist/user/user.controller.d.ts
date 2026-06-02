@@ -9,13 +9,28 @@ export declare class UserController {
         role: string;
         subscriptionStatus: string;
         subscriptionTier: string | null;
+        creditLimit: number;
     } | null>;
     subscribe(req: any, tier: string): Promise<{
         id: string;
         createdAt: Date;
+        userId: string;
         tier: string;
         status: string;
         paymentInfo: string | null;
-        userId: string;
     }>;
+    requestDeletion(req: any, reason?: string): Promise<{
+        id: string;
+        createdAt: Date;
+        userId: string;
+        status: string;
+        reason: string | null;
+    }>;
+    getMyDeletionRequest(req: any): Promise<{
+        id: string;
+        createdAt: Date;
+        userId: string;
+        status: string;
+        reason: string | null;
+    } | null>;
 }

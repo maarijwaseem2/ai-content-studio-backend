@@ -23,6 +23,8 @@ export declare class AdminService {
         role: string;
         subscriptionStatus: string;
         subscriptionTier: string | null;
+        accountStatus: string;
+        deletedAt: Date | null;
         createdAt: Date;
         items: {
             createdAt: Date;
@@ -65,4 +67,33 @@ export declare class AdminService {
         tokenUsage: import("@prisma/client/runtime/library").JsonValue | null;
         isSaved: boolean;
     }[]>;
+    getDeletionRequests(): Promise<({
+        user: {
+            id: string;
+            email: string;
+            credits: number;
+            role: string;
+            subscriptionTier: string | null;
+            createdAt: Date;
+            _count: {
+                items: number;
+            };
+        };
+    } & {
+        id: string;
+        createdAt: Date;
+        userId: string;
+        status: string;
+        reason: string | null;
+    })[]>;
+    approveDeletionRequest(requestId: string): Promise<{
+        message: string;
+    }>;
+    rejectDeletionRequest(requestId: string): Promise<{
+        id: string;
+        createdAt: Date;
+        userId: string;
+        status: string;
+        reason: string | null;
+    }>;
 }

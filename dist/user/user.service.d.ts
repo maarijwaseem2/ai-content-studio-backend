@@ -9,13 +9,28 @@ export declare class UserService {
         role: string;
         subscriptionStatus: string;
         subscriptionTier: string | null;
+        creditLimit: number;
     } | null>;
     subscribe(userId: string, tier: string): Promise<{
         id: string;
         createdAt: Date;
+        userId: string;
         tier: string;
         status: string;
         paymentInfo: string | null;
-        userId: string;
     }>;
+    requestDeletion(userId: string, reason?: string): Promise<{
+        id: string;
+        createdAt: Date;
+        userId: string;
+        status: string;
+        reason: string | null;
+    }>;
+    getMyDeletionRequest(userId: string): Promise<{
+        id: string;
+        createdAt: Date;
+        userId: string;
+        status: string;
+        reason: string | null;
+    } | null>;
 }

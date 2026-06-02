@@ -54,4 +54,22 @@ export class AdminController {
   getUserContent(@Param('id') id: string) {
     return this.adminService.getUserContent(id);
   }
+
+  @Get('deletion-requests')
+  @Roles('ADMIN')
+  getDeletionRequests() {
+    return this.adminService.getDeletionRequests();
+  }
+
+  @Post('deletion-requests/:id/approve')
+  @Roles('ADMIN')
+  approveDeletion(@Param('id') id: string) {
+    return this.adminService.approveDeletionRequest(id);
+  }
+
+  @Post('deletion-requests/:id/reject')
+  @Roles('ADMIN')
+  rejectDeletion(@Param('id') id: string) {
+    return this.adminService.rejectDeletionRequest(id);
+  }
 }

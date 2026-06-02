@@ -84,7 +84,6 @@ export class AdminService {
       PRO: 1000,
       BUSINESS: 5000,
     };
-    const credits = creditsMap[request.tier.toUpperCase()] || 0;
 
     return this.prisma.$transaction(async (tx) => {
       await (tx as any).subscriptionRequest.update({
@@ -92,12 +91,22 @@ export class AdminService {
         data: { status: 'APPROVED' },
       });
 
+      const existing = await tx.user.findUnique({
+        where: { id: request.userId },
+      });
+      if (!existing) throw new Error('User not found');
+
+      const tierCredits = creditsMap[request.tier.toUpperCase()] || 0;
+      const newCredits = existing.credits + tierCredits;
+      const newLimit = Math.max(existing.creditLimit ?? 250, newCredits);
+
       await tx.user.update({
         where: { id: request.userId },
         data: {
           subscriptionStatus: 'ACTIVE',
           subscriptionTier: request.tier,
-          credits: { increment: credits },
+          credits: newCredits,
+          creditLimit: newLimit,
         },
       });
     });
@@ -126,6 +135,8 @@ export class AdminService {
         credits: true,
         subscriptionStatus: true,
         subscriptionTier: true,
+        accountStatus: true,
+        deletedAt: true,
         createdAt: true,
         _count: {
           select: { items: true },
@@ -176,6 +187,58 @@ export class AdminService {
     return this.prisma.content.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async getDeletionRequests() {
+    return this.prisma.accountDeletionRequest.findMany({
+      where: { status: 'PENDING' },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            credits: true,
+            role: true,
+            subscriptionTier: true,
+            createdAt: true,
+            _count: { select: { items: true } },
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async approveDeletionRequest(requestId: string) {
+    const req = await this.prisma.accountDeletionRequest.findUnique({
+      where: { id: requestId },
+    });
+    if (!req) throw new Error('Request not found');
+
+    return this.prisma.$transaction(async (tx) => {
+      await tx.accountDeletionRequest.update({
+        where: { id: requestId },
+        data: { status: 'APPROVED' },
+      });
+      // Soft delete: keep row for audit, block all access via accountStatus.
+      await tx.user.update({
+        where: { id: req.userId },
+        data: {
+          accountStatus: 'DELETED',
+          deletedAt: new Date(),
+          verificationOtp: null,
+          verificationOtpExpires: null,
+        },
+      });
+      return { message: 'Account marked as deleted' };
+    });
+  }
+
+  async rejectDeletionRequest(requestId: string) {
+    return this.prisma.accountDeletionRequest.update({
+      where: { id: requestId },
+      data: { status: 'REJECTED' },
     });
   }
 }

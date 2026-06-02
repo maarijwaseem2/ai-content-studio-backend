@@ -24,6 +24,10 @@ export class GeneratorService {
       throw new BadRequestException('Insufficient credits');
     }
 
+    if (user.accountStatus !== 'VERIFIED') {
+      throw new BadRequestException('Account must be verified before generating');
+    }
+
     const prompt = `Generate product marketing content for:
 Product: ${input.productName}
 Category: ${input.category}
@@ -56,7 +60,7 @@ Return a JSON object with:
       output = JSON.parse(completion.choices[0].message.content || '{}');
       usage = completion.usage;
     } catch (e) {
-      // Fallback for demo if API key is missing
+      console.error('OpenAI generation failed, using fallback:', e);
       output = {
         description:
           'Exquisitely crafted, the ' +

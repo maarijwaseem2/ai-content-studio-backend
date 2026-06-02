@@ -24,6 +24,7 @@ let UserService = class UserService {
                 id: true,
                 email: true,
                 credits: true,
+                creditLimit: true,
                 role: true,
                 subscriptionStatus: true,
                 subscriptionTier: true,
@@ -37,6 +38,31 @@ let UserService = class UserService {
                 tier: tier.toUpperCase(),
                 status: 'PENDING',
             },
+        });
+    }
+    async requestDeletion(userId, reason) {
+        const user = await this.prisma.user.findUnique({ where: { id: userId } });
+        if (!user)
+            throw new common_1.BadRequestException('User not found');
+        if (user.role === 'ADMIN')
+            throw new common_1.ForbiddenException('Admin accounts cannot request deletion');
+        const existing = await this.prisma.accountDeletionRequest.findFirst({
+            where: { userId, status: 'PENDING' },
+        });
+        if (existing)
+            throw new common_1.ConflictException('A deletion request is already pending for your account');
+        return this.prisma.accountDeletionRequest.create({
+            data: {
+                userId,
+                reason: reason?.trim() || null,
+                status: 'PENDING',
+            },
+        });
+    }
+    async getMyDeletionRequest(userId) {
+        return this.prisma.accountDeletionRequest.findFirst({
+            where: { userId, status: 'PENDING' },
+            orderBy: { createdAt: 'desc' },
         });
     }
 };

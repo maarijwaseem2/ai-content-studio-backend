@@ -27,6 +27,12 @@ let UserController = class UserController {
     subscribe(req, tier) {
         return this.userService.subscribe(req.user.id, tier);
     }
+    requestDeletion(req, reason) {
+        return this.userService.requestDeletion(req.user.id, reason);
+    }
+    getMyDeletionRequest(req) {
+        return this.userService.getMyDeletionRequest(req.user.id);
+    }
 };
 exports.UserController = UserController;
 __decorate([
@@ -44,6 +50,21 @@ __decorate([
     __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "subscribe", null);
+__decorate([
+    (0, common_1.Post)('delete-request'),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Body)('reason')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "requestDeletion", null);
+__decorate([
+    (0, common_1.Get)('delete-request'),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], UserController.prototype, "getMyDeletionRequest", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('user'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),

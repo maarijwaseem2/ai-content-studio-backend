@@ -20,6 +20,8 @@ export declare class AdminController {
         role: string;
         subscriptionStatus: string;
         subscriptionTier: string | null;
+        accountStatus: string;
+        deletedAt: Date | null;
         createdAt: Date;
         items: {
             createdAt: Date;
@@ -65,4 +67,33 @@ export declare class AdminController {
         tokenUsage: import("@prisma/client/runtime/library").JsonValue | null;
         isSaved: boolean;
     }[]>;
+    getDeletionRequests(): Promise<({
+        user: {
+            id: string;
+            email: string;
+            credits: number;
+            role: string;
+            subscriptionTier: string | null;
+            createdAt: Date;
+            _count: {
+                items: number;
+            };
+        };
+    } & {
+        id: string;
+        createdAt: Date;
+        userId: string;
+        status: string;
+        reason: string | null;
+    })[]>;
+    approveDeletion(id: string): Promise<{
+        message: string;
+    }>;
+    rejectDeletion(id: string): Promise<{
+        id: string;
+        createdAt: Date;
+        userId: string;
+        status: string;
+        reason: string | null;
+    }>;
 }

@@ -15,19 +15,59 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
+function isValidEmail(email) {
+    return (typeof email === 'string' &&
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()));
+}
 let AuthController = class AuthController {
     authService;
     constructor(authService) {
         this.authService = authService;
     }
     async signup(body) {
-        return this.authService.signup(body.email, body.password);
+        if (!isValidEmail(body?.email))
+            throw new common_1.BadRequestException('Invalid email');
+        if (!body?.password || String(body.password).length < 6)
+            throw new common_1.BadRequestException('Password must be at least 6 characters');
+        return this.authService.signup(body.email.trim().toLowerCase(), body.password);
     }
     async login(body) {
-        const user = await this.authService.validateUser(body.email, body.password);
-        if (!user)
-            throw new common_1.UnauthorizedException('Invalid credentials');
-        return this.authService.login(user);
+        if (!isValidEmail(body?.email))
+            throw new common_1.BadRequestException('Invalid email');
+        return this.authService.loginWithStatus(body.email.trim().toLowerCase(), body.password);
+    }
+    async verifySignup(body) {
+        if (!isValidEmail(body?.email))
+            throw new common_1.BadRequestException('Invalid email');
+        if (!body?.otp)
+            throw new common_1.BadRequestException('OTP is required');
+        return this.authService.verifySignup(body.email.trim().toLowerCase(), String(body.otp));
+    }
+    async resendSignupOtp(body) {
+        if (!isValidEmail(body?.email))
+            throw new common_1.BadRequestException('Invalid email');
+        return this.authService.resendSignupOtp(body.email.trim().toLowerCase());
+    }
+    async forgotPassword(body) {
+        if (!isValidEmail(body?.email))
+            throw new common_1.BadRequestException('Invalid email');
+        return this.authService.forgotPassword(body.email.trim().toLowerCase());
+    }
+    async verifyOtp(body) {
+        if (!isValidEmail(body?.email))
+            throw new common_1.BadRequestException('Invalid email');
+        if (!body?.otp)
+            throw new common_1.BadRequestException('OTP is required');
+        return this.authService.verifyOtp(body.email.trim().toLowerCase(), String(body.otp));
+    }
+    async resetPassword(body) {
+        if (!isValidEmail(body?.email))
+            throw new common_1.BadRequestException('Invalid email');
+        if (!body?.otp)
+            throw new common_1.BadRequestException('OTP is required');
+        if (!body?.newPassword || String(body.newPassword).length < 6)
+            throw new common_1.BadRequestException('Password must be at least 6 characters');
+        return this.authService.resetPassword(body.email.trim().toLowerCase(), String(body.otp), String(body.newPassword));
     }
 };
 exports.AuthController = AuthController;
@@ -45,6 +85,41 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
+__decorate([
+    (0, common_1.Post)('verify-signup'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "verifySignup", null);
+__decorate([
+    (0, common_1.Post)('resend-signup-otp'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "resendSignupOtp", null);
+__decorate([
+    (0, common_1.Post)('forgot-password'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "forgotPassword", null);
+__decorate([
+    (0, common_1.Post)('verify-otp'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "verifyOtp", null);
+__decorate([
+    (0, common_1.Post)('reset-password'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "resetPassword", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])
